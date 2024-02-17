@@ -2,7 +2,9 @@ const puppeteer = require("puppeteer");
 const fs = require("fs/promises");
 const { argv } = require("process");
 
-const url = argv[2];
+const url =
+  argv[2] ||
+  "https://old.reddit.com/r/learnprogramming/comments/t2jaes/i_learned_to_code_in_2_months_and_got_a_remote/";
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
