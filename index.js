@@ -22,12 +22,24 @@ const puppeteer = require("puppeteer");
 
   const comments = await page.$$(".entry");
 
+  const formattedComments = [];
+
   for (let comment of comments) {
-    const points = await comment
-      .$eval(".score", (el) => el.innerHTML)
-      .catch(() => console.error("No child entry"));
-    console.log(points);
+    const point = await comment
+      .$eval(".score", (el) => parseInt(el.innerText))
+      .catch(() => console.error(""));
+
+    const rawText = await comment
+      .$eval(".usertext-body", (el) => el.innerText)
+      .catch(() => console.error(""));
+
+    if (point && rawText) {
+      const text = rawText.replace(/\n/g, "");
+      formattedComments.push({point, text});
+    }
   }
+
+  console.log(formattedComments);
 
   await browser.close();
 })();
