@@ -41,7 +41,7 @@ const fs = require("fs/promises");
   }
 
   const sortedComments = [...formattedComments].sort(
-    (a, b) => a.point - b.point
+    (a, b) => b.point - a.point
   );
 
   const dataFileHandle = await fs.open("data/data.csv", "w");
@@ -49,11 +49,21 @@ const fs = require("fs/promises");
 
   sortedComments.forEach((el) => {
     let line = [];
+
     Object.keys(el).forEach((key) => line.push(el[key]));
-    writeStream.write(line.join(",") + "\n");
+
+    line = [...line].map((el, idx) =>
+      idx !== line.length - 1 ? `"${el}",` : `"${el}"`
+    );
+
+    writeStream.write(line.join("") + "\n");
   });
 
   writeStream.end();
+
+  writeStream.on("finish", () => {
+    dataFileHandle.close();
+  });
 
   await browser.close();
 })();
