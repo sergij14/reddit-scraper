@@ -11,8 +11,6 @@ const puppeteer = require("puppeteer");
 
   let expandButtons = await page.$$(".morecomments");
 
-  console.log(expandButtons.length);
-
   while (expandButtons.length) {
     for (let btn of expandButtons) {
       await btn.click();
@@ -20,6 +18,15 @@ const puppeteer = require("puppeteer");
     }
 
     expandButtons = await page.$$(".morecomments");
+  }
+
+  const comments = await page.$$(".entry");
+
+  for (let comment of comments) {
+    const points = await comment
+      .$eval(".score", (el) => el.innerHTML)
+      .catch(() => console.error("No child entry"));
+    console.log(points);
   }
 
   await browser.close();
