@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const fs = require("fs/promises");
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
@@ -35,11 +36,24 @@ const puppeteer = require("puppeteer");
 
     if (point && rawText) {
       const text = rawText.replace(/\n/g, "");
-      formattedComments.push({point, text});
+      formattedComments.push({ point, text });
     }
   }
 
-  console.log(formattedComments);
+  const sortedComments = [...formattedComments].sort(
+    (a, b) => a.point - b.point
+  );
+
+  const dataFileHandle = await fs.open("data/data.csv", "w");
+  const writeStream = dataFileHandle.createWriteStream();
+
+  sortedComments.forEach((el) => {
+    let line = [];
+    Object.keys(el).forEach((key) => line.push(el[key]));
+    writeStream.write(line.join(",") + "\n");
+  });
+
+  writeStream.end();
 
   await browser.close();
 })();
